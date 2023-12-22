@@ -5,10 +5,6 @@ packer {
       version = "~>1.0"
       source  = "github.com/hashicorp/amazon"
     }
-    azure = {
-      version = "~>1.0"
-      source  = "github.com/hashicorp/azure"
-    }
   }
 }
 
@@ -45,30 +41,6 @@ source "amazon-ebs" "base" {
   }
 }
 
-source "azure-arm" "base" {
-  os_type                   = "Linux"
-  build_resource_group_name = var.az_resource_group
-  vm_size                   = "Standard_B2s"
-
-  # Source image
-  image_publisher = "Canonical"
-  image_offer     = "0001-com-ubuntu-server-jammy"
-  image_sku       = "22_04-lts-gen2"
-  image_version   = "latest"
-
-  # Destination image
-  managed_image_name                = local.image_name
-  managed_image_resource_group_name = var.az_resource_group
-
-  azure_tags = {
-    owner      = var.owner
-    department = var.department
-    build-time = local.timestamp
-  }
-
-  use_azure_cli_auth = true
-}
-
 build {
   hcp_packer_registry {
     bucket_name = "ubuntu22-base"
@@ -86,7 +58,6 @@ build {
 
   sources = [
     "source.amazon-ebs.base",
-    "source.azure-arm.base"
   ]
 
   # Make sure cloud-init has finished

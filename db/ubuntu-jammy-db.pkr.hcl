@@ -5,10 +5,6 @@ packer {
       version = "~>1.0"
       source  = "github.com/hashicorp/amazon"
     }
-    azure = {
-      version = "~>1.0"
-      source  = "github.com/hashicorp/azure"
-    }
   }
 }
 
@@ -22,13 +18,6 @@ data "hcp-packer-image" "ubuntu22-base-aws" {
   iteration_id   = data.hcp-packer-iteration.ubuntu22-base.id
   cloud_provider = "aws"
   region         = var.aws_region
-}
-
-data "hcp-packer-image" "ubuntu22-base-azure" {
-  bucket_name    = data.hcp-packer-iteration.ubuntu22-base.bucket_name
-  iteration_id   = data.hcp-packer-iteration.ubuntu22-base.id
-  cloud_provider = "azure"
-  region         = var.az_region
 }
 
 locals {
@@ -52,28 +41,6 @@ source "amazon-ebs" "base" {
   }
 }
 
-source "azure-arm" "base" {
-  os_type                   = "Linux"
-  build_resource_group_name = var.az_resource_group
-  vm_size                   = "Standard_B2s"
-
-  # Source image
-  custom_managed_image_name                = data.hcp-packer-image.ubuntu22-base-azure.labels.managed_image_name
-  custom_managed_image_resource_group_name = data.hcp-packer-image.ubuntu22-base-azure.labels.managed_image_resourcegroup_name
-
-  # Destination image
-  managed_image_name                = local.image_name
-  managed_image_resource_group_name = var.az_resource_group
-
-  azure_tags = {
-    owner      = var.owner
-    department = var.department
-    build-time = local.timestamp
-  }
-
-  use_azure_cli_auth = true
-}
-
 build {
   hcp_packer_registry {
     bucket_name = "ubuntu22-mariadb"
@@ -92,7 +59,6 @@ build {
 
   sources = [
     "source.amazon-ebs.base",
-    "source.azure-arm.base"
   ]
 
   # Make sure cloud-init has finished

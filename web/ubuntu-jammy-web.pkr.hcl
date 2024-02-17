@@ -8,16 +8,16 @@ packer {
   }
 }
 
-data "hcp-packer-iteration" "ubuntu22-base" {
-  bucket_name = var.base_image_bucket
-  channel     = var.base_image_channel
+data "hcp-packer-version" "ubuntu22-base" {
+  bucket_name  = var.base_image_bucket
+  channel_name = var.base_image_channel
 }
 
-data "hcp-packer-image" "ubuntu22-base-aws" {
-  bucket_name    = data.hcp-packer-iteration.ubuntu22-base.bucket_name
-  iteration_id   = data.hcp-packer-iteration.ubuntu22-base.id
-  cloud_provider = "aws"
-  region         = var.aws_region
+data "hcp-packer-artifact" "ubuntu22-base-aws" {
+  bucket_name         = data.hcp-packer-version.ubuntu22-base.bucket_name
+  version_fingerprint = data.hcp-packer-version.ubuntu22-base.fingerprint
+  platform            = "aws"
+  region              = var.aws_region
 }
 
 locals {
@@ -27,7 +27,7 @@ locals {
 
 source "amazon-ebs" "base" {
   region        = var.aws_region
-  source_ami    = data.hcp-packer-image.ubuntu22-base-aws.id
+  source_ami    = data.hcp-packer-artifact.ubuntu22-base-aws.external_identifier
   instance_type = "t3.small"
   ssh_username  = "ubuntu"
   ami_name      = local.image_name
@@ -36,7 +36,7 @@ source "amazon-ebs" "base" {
   tags = {
     owner         = var.owner
     department    = var.department
-    source_ami_id = data.hcp-packer-image.ubuntu22-base-aws.id
+    source_ami_id = data.hcp-packer-artifact.ubuntu22-base-aws.external_identifier
     Name          = local.image_name
   }
 }

@@ -4,7 +4,7 @@ A collection of Packer builds for Ubuntu 22.04 (jammy) which publish to the HCP 
 
 ## Requirements
 
-[Packer](https://www.packer.io/) v1.7.7 or higher.
+[Packer](https://www.packer.io/) v1.10.1 or higher.
 
 To build all images, AWS credentials must be available using one of the following mechanisms:
 
@@ -25,23 +25,23 @@ Or if you're not on Linux/macOS, you can run Packer directly (ex: in a Windows P
 
 ## Terraform integration
 
-Use the "Use as data source" code generator in the HCP Packer UI to generate a Terraform `hcp_packer_image` data source block.
+Use the "Use as data source" code generator in the HCP Packer UI to generate a Terraform `hcp_packer_artifact` data source block.
 
 Example:
 
 ```hcl
-data "hcp_packer_image" "ubuntu22-nginx" {
-  bucket_name     = "ubuntu22-nginx"
-  channel         = "production"
-  cloud_provider  = "aws"
-  region          = "us-east-1"
+data "hcp_packer_artifact" "ubuntu22-nginx" {
+  bucket_name  = "ubuntu22-nginx"
+  channel_name = "production"
+  platform     = "aws"
+  region       = "us-east-1"
 }
 
 # Then replace your existing references with
-# data.hcp_packer_image.ubuntu22-nginx.cloud_image_id
+# data.hcp_packer_artifact.ubuntu22-nginx.external_identifier
 ```
 
-To integrate with **Terraform Cloud continuous validation**, add a lifecycle postcondition block to your instance/VM resource:
+To integrate with **Terraform Cloud continuous validation**, add a lifecycle postcondition block to your instance resource:
 
 ```hcl
 resource "aws_instance" "my_ec2" {
@@ -49,7 +49,7 @@ resource "aws_instance" "my_ec2" {
 
   lifecycle {
     postcondition {
-      condition     = self.ami == data.hcp_packer_image.ubuntu22-nginx.cloud_image_id
+      condition     = self.ami == data.hcp_packer_artifact.ubuntu22-nginx.external_identifier
       error_message = "A new source AMI is available in the HCP Packer channel."
     }    
   }

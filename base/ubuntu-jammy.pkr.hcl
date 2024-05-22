@@ -49,6 +49,7 @@ source "azure-arm" "base" {
   os_type                   = "Linux"
   build_resource_group_name = var.az_resource_group
   vm_size                   = "Standard_B2s"
+  public_ip_sku             = "Standard"
 
   # Source image
   image_publisher = "Canonical"

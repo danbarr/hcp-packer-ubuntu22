@@ -20,13 +20,14 @@ variable "az_resource_group" {
 }
 
 variable "az_subscription_id" {
-  description = "The Azure subscription ID where the Compute gallery exists."
-  type      = string
-  sensitive = true
+  description = "The Azure subscription ID where the Compute Gallery is located."
+  type        = string
+  sensitive   = true
 }
 
 variable "az_compute_gallery" {
-  type    = string
+  description = "The name of an existing Azure Compute Gallery where the image will be published."
+  type        = string
 }
 
 variable "department" {

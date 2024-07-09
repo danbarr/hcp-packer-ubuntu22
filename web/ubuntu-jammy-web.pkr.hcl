@@ -73,8 +73,11 @@ source "azure-arm" "base" {
     gallery_name         = var.az_compute_gallery
     image_name           = "ubuntu22-nginx"
     image_version        = formatdate("YYYY.MMDD.hhmm", timestamp())
-    replication_regions  = [var.az_region]
     storage_account_type = "Standard_LRS"
+
+    target_region {
+      name = var.az_region
+    }
   }
 
   azure_tags = {

@@ -2,11 +2,11 @@ packer {
   required_version = ">= 1.10.1"
   required_plugins {
     amazon = {
-      version = "~>1.3"
+      version = "~> 1.3"
       source  = "github.com/hashicorp/amazon"
     }
     azure = {
-      version = "~>2.0"
+      version = "~> 2.1"
       source  = "github.com/hashicorp/azure"
     }
   }
@@ -55,26 +55,30 @@ source "amazon-ebs" "base" {
 source "azure-arm" "base" {
   os_type                   = "Linux"
   build_resource_group_name = var.az_resource_group
-  vm_size                   = "Standard_B2s"
+  vm_size                   = "Standard_B2ls_v2"
   public_ip_sku             = "Standard"
 
   # Source image
-  custom_managed_image_name                = data.hcp-packer-artifact.ubuntu22-base-azure.labels.managed_image_name
-  custom_managed_image_resource_group_name = data.hcp-packer-artifact.ubuntu22-base-azure.labels.managed_image_resourcegroup_name
+  shared_image_gallery {
+    subscription   = var.az_subscription_id
+    resource_group = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_resource_group
+    gallery_name   = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_name
+    image_name     = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_image_name
+    image_version  = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_image_version
+  }
 
-  # Destination image
-  managed_image_name                = local.image_name
-  managed_image_resource_group_name = var.az_resource_group
-
-  # Compute gallery
+  # Destination Compute Gallery
   shared_image_gallery_destination {
     subscription         = var.az_subscription_id
     resource_group       = var.az_resource_group
     gallery_name         = var.az_compute_gallery
     image_name           = "ubuntu22-nginx"
     image_version        = formatdate("YYYY.MMDD.hhmm", timestamp())
-    replication_regions  = [var.az_region]
     storage_account_type = "Standard_LRS"
+
+    target_region {
+      name = var.az_region
+    }
   }
 
   azure_tags = {

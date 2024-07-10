@@ -13,7 +13,11 @@ To build all images, AWS and Azure credentials must be available using one of th
 
 An HCP Packer organization, with a "Contributor" service principal key set via the `HCP_CLIENT_ID` and `HCP_CLIENT_SECRET` environment variables.
 
-For Azure, an existing resource group where the builds will take place and images will be published.
+For Azure:
+
+- An existing resource group where the builds will take place
+- An Azure Compute Gallery in the same resource group, where images will be published
+- Image definition(s) in the gallery corresponding to the `shared_image_gallery_destination.image_name` property of each build
 
 ## Usage
 

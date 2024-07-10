@@ -55,7 +55,7 @@ source "amazon-ebs" "base" {
 source "azure-arm" "base" {
   os_type                   = "Linux"
   build_resource_group_name = var.az_resource_group
-  vm_size                   = "Standard_B2s"
+  vm_size                   = "Standard_B2ls_v2"
   public_ip_sku             = "Standard"
 
   # Source image

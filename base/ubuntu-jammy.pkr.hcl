@@ -57,11 +57,7 @@ source "azure-arm" "base" {
   image_sku       = "22_04-lts-gen2"
   image_version   = "latest"
 
-  # Destination image
-  managed_image_name                = local.image_name
-  managed_image_resource_group_name = var.az_resource_group
-
-  # Compute gallery
+  # Destination Compute Gallery
   shared_image_gallery_destination {
     subscription         = var.az_subscription_id
     resource_group       = var.az_resource_group

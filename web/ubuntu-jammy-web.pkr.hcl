@@ -59,14 +59,15 @@ source "azure-arm" "base" {
   public_ip_sku             = "Standard"
 
   # Source image
-  custom_managed_image_name                = data.hcp-packer-artifact.ubuntu22-base-azure.labels.managed_image_name
-  custom_managed_image_resource_group_name = data.hcp-packer-artifact.ubuntu22-base-azure.labels.managed_image_resourcegroup_name
+  shared_image_gallery {
+    subscription   = var.az_subscription_id
+    resource_group = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_resource_group
+    gallery_name   = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_name
+    image_name     = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_image_name
+    image_version  = data.hcp-packer-artifact.ubuntu22-base-azure.labels.sig_image_version
+  }
 
-  # Destination image
-  managed_image_name                = local.image_name
-  managed_image_resource_group_name = var.az_resource_group
-
-  # Compute gallery
+  # Destination Compute Gallery
   shared_image_gallery_destination {
     subscription         = var.az_subscription_id
     resource_group       = var.az_resource_group
